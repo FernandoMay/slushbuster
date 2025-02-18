@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:slushbuster/cart.dart';
 import 'package:slushbuster/models.dart';
 import 'package:slushbuster/productpage.dart';
 
 class HomePage extends StatefulWidget {
-  // final CartBloc cartBloc;
-
   const HomePage({super.key});
 
   @override
@@ -14,74 +11,74 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late Future<List<Product>> _products;
-  late List<Product> _recommendedProducts;
+  late List<Product> _products;
+  late List<Product> _filteredProducts;
 
   @override
   void initState() {
     super.initState();
-
-    _recommendedProducts = [
+    _products = [
       Product(
         id: '1',
-        name: 'Chaqueta',
-        description: 'Una chaqueta elegante para el invierno',
-        imageUrl: 'https://via.placeholder.com/150',
-        price: 50.0,
+        name: 'Chaqueta de Invierno',
+        description: 'Una chaqueta elegante y cálida para el invierno',
+        imageUrl: 'https://picsum.photos/200/300?random=1',
+        price: 89.99,
       ),
       Product(
         id: '2',
-        name: 'Jeans',
-        description: 'Unos jeans cómodos para cualquier ocasión',
-        imageUrl: 'https://via.placeholder.com/150',
-        price: 30.0,
+        name: 'Jeans Clásicos',
+        description: 'Jeans cómodos y duraderos para cualquier ocasión',
+        imageUrl: 'https://picsum.photos/200/300?random=2',
+        price: 59.99,
       ),
       Product(
         id: '3',
-        name: 'Zapatillas',
-        description: 'Unas zapatillas deportivas para correr',
-        imageUrl: 'https://via.placeholder.com/150',
-        price: 40.0,
+        name: 'Zapatillas Deportivas',
+        description: 'Zapatillas ideales para correr y hacer ejercicio',
+        imageUrl: 'https://picsum.photos/200/300?random=3',
+        price: 79.99,
+      ),
+      Product(
+        id: '4',
+        name: 'Camisa Casual',
+        description: 'Camisa elegante para ocasiones casuales',
+        imageUrl: 'https://picsum.photos/200/300?random=4',
+        price: 45.99,
+      ),
+      Product(
+        id: '5',
+        name: 'Sudadera con Capucha',
+        description: 'Sudadera cómoda y moderna para el día a día',
+        imageUrl: 'https://picsum.photos/200/300?random=5',
+        price: 49.99,
+      ),
+      Product(
+        id: '6',
+        name: 'Gorra Deportiva',
+        description: 'Gorra ajustable para protegerte del sol',
+        imageUrl: 'https://picsum.photos/200/300?random=6',
+        price: 24.99,
       ),
     ];
-    _products = _getProducts();
-  }
-
-  Future<List<Product>> _getProducts() async {
-    final QuerySnapshot querySnapshot =
-        await FirebaseFirestore.instance.collection('products').get();
-
-    final List<Product> products = [];
-
-    for (final doc in querySnapshot.docs) {
-      final data = doc.data() as Map<String, dynamic>;
-      // final id = doc.id;
-      final product = Product.fromJson(data);
-
-      products.add(product);
-    }
-
-    return products;
+    _filteredProducts = List.from(_products);
   }
 
   void _onProductPressed(Product product) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ProductPage(
-          productId: product.id,
-          databaseReference: null,
-        ),
+        builder: (context) => ProductPage(product: product),
       ),
     );
   }
 
   void _searchProduct(String query) {
     setState(() {
-      _products = _getProducts().then((products) => products
+      _filteredProducts = _products
           .where((product) =>
               product.name.toLowerCase().contains(query.toLowerCase()))
-          .toList());
+          .toList();
     });
   }
 
@@ -104,110 +101,166 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          SizedBox(
-            height: 200.0,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: _recommendedProducts.length,
-              itemBuilder: (context, index) {
-                final product = _recommendedProducts[index];
-
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: InkWell(
-                    onTap: () => _onProductPressed(product),
-                    child: Column(
-                      children: [
-                        Image.network(
-                          product.imageUrl,
-                          height: 150.0,
-                          width: 150.0,
-                        ),
-                        const SizedBox(height: 5.0),
-                        Text(product.name),
-                        const SizedBox(height: 5.0),
-                        Text(
-                          '\$${product.price.toStringAsFixed(2)}',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
+      body: CustomScrollView(
+        slivers: [
+          // Featured Products
+          SliverToBoxAdapter(
+            child: Container(
+              height: 200.0,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: _products.length,
+                itemBuilder: (context, index) {
+                  final product = _products[index];
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: InkWell(
+                      onTap: () => _onProductPressed(product),
+                      child: Hero(
+                        tag: 'product_${product.id}',
+                        child: Card(
+                          elevation: 4,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-          const SizedBox(height: 10.0),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              decoration: const InputDecoration(
-                hintText: 'Buscar productos',
-              ),
-              onChanged: (value) {
-                _searchProduct(value);
-              },
-            ),
-          ),
-          const SizedBox(height: 10.0),
-          Expanded(
-            child: FutureBuilder<List<Product>>(
-              future: _products,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done &&
-                    snapshot.hasData) {
-                  final products = snapshot.data!;
-
-                  return GridView.builder(
-                    padding: const EdgeInsets.all(10.0),
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      childAspectRatio: 0.7,
-                      crossAxisSpacing: 10.0,
-                      mainAxisSpacing: 10.0,
-                    ),
-                    itemCount: products.length,
-                    itemBuilder: (context, index) {
-                      final product = products[index];
-
-                      return InkWell(
-                        onTap: () => _onProductPressed(product),
-                        child: Column(
-                          children: [
-                            Expanded(
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(10.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              ClipRRect(
+                                borderRadius: const BorderRadius.vertical(
+                                  top: Radius.circular(12),
+                                ),
                                 child: Image.network(
                                   product.imageUrl,
+                                  height: 120.0,
+                                  width: 150.0,
                                   fit: BoxFit.cover,
                                 ),
                               ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      product.name,
+                                      style: Theme.of(context).textTheme.titleMedium,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      '\$${product.price.toStringAsFixed(2)}',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleSmall
+                                          ?.copyWith(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .primary,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+          // Search Bar
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: TextField(
+                decoration: InputDecoration(
+                  hintText: 'Buscar productos',
+                  prefixIcon: const Icon(Icons.search),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                onChanged: _searchProduct,
+              ),
+            ),
+          ),
+          // Product Grid
+          SliverPadding(
+            padding: const EdgeInsets.all(16.0),
+            sliver: SliverGrid(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                childAspectRatio: 0.7,
+                crossAxisSpacing: 16.0,
+                mainAxisSpacing: 16.0,
+              ),
+              delegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  final product = _filteredProducts[index];
+                  return InkWell(
+                    onTap: () => _onProductPressed(product),
+                    child: Hero(
+                      tag: 'product_${product.id}',
+                      child: Card(
+                        elevation: 4,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: ClipRRect(
+                                borderRadius: const BorderRadius.vertical(
+                                  top: Radius.circular(12),
+                                ),
+                                child: Image.network(
+                                  product.imageUrl,
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                ),
+                              ),
                             ),
-                            const SizedBox(height: 5.0),
-                            Text(product.name),
-                            const SizedBox(height: 5.0),
-                            Text(
-                              '\$${product.price.toStringAsFixed(2)}',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    product.name,
+                                    style: Theme.of(context).textTheme.titleMedium,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    '\$${product.price.toStringAsFixed(2)}',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleSmall
+                                        ?.copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primary,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
                         ),
-                      );
-                    },
+                      ),
+                    ),
                   );
-                }
-
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              },
+                },
+                childCount: _filteredProducts.length,
+              ),
             ),
           ),
         ],
@@ -215,84 +268,3 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-
-
-// import 'package:flutter/material.dart';
-// import 'package:slushbuster/cart.dart';
-// import 'package:slushbuster/cartbloc.dart';
-// import 'package:slushbuster/models.dart';
-// import 'package:slushbuster/productpage.dart';
-
-// class HomePage extends StatefulWidget {
-//   final CartBloc cartBloc;
-
-//   const HomePage({
-//     required this.cartBloc,
-//   });
-
-//   @override
-//   _HomePageState createState() => _HomePageState();
-// }
-
-// class _HomePageState extends State<HomePage> {
-//   late List<Product> _products;
-
-//   @override
-//   void initState() {
-//     super.initState();
-    
-
-//   void _onProductPressed(Product product) {
-//     Navigator.push(
-//       context,
-//       MaterialPageRoute(
-//         builder: (context) => ProductPage(
-//           productId: product.id, databaseReference: null,
-//         ),
-//       ),
-//     );
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: const Text('Slushbuster'),
-//         actions: [
-//           IconButton(
-//             icon: const Icon(Icons.shopping_cart),
-//             onPressed: () {
-//               Navigator.push(
-//                 context,
-//                 MaterialPageRoute(
-//                   builder: (context) => const CartPage(),
-//                 ),
-//               );
-//             },
-//           ),
-//         ],
-//       ),
-//       body: ListView.builder(
-//         itemCount: _products.length,
-//         itemBuilder: (context, index) {
-//           final product = _products[index];
-
-//           return Card(
-//             child: ListTile(
-//               leading: Image.network(
-//                 product.imageUrl,
-//                 width: 50.0,
-//                 height: 50.0,
-//                 fit: BoxFit.cover,
-//               ),
-//               title: Text(product.name),
-//               subtitle: Text(product.description),
-//               trailing: Text('\$${product.price}'),
-//               onTap: () => _onProductPressed(product),
-//             ),
-//           );
-//         },
-//       ),
-//     );
-//   }
-// }

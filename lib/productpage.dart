@@ -1,86 +1,86 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:firebase_database/firebase_database.dart';
-import 'package:slushbuster/cartbloc.dart';
 import 'package:slushbuster/models.dart';
+import 'package:slushbuster/cartbloc.dart';
+import 'package:slushbuster/config/constants/app_constants.dart';
 
-class ProductPage extends StatefulWidget {
-  final DatabaseReference databaseReference;
-  final String productId;
+class ProductPage extends StatelessWidget {
+  final Product product;
 
-  const ProductPage({required this.databaseReference, required this.productId});
-
-  @override
-  _ProductPageState createState() => _ProductPageState();
-}
-
-class _ProductPageState extends State<ProductPage> {
-  late Product _product;
-
-  @override
-  void initState() {
-    super.initState();
-
-    widget.databaseReference
-        .child('products/${widget.productId}')
-        .onValue
-        .listen((event) {
-      final data = event.snapshot.value as Map<String, dynamic>;
-      _product = Product.fromJson(data);
-      setState(() {});
-    });
-  }
+  const ProductPage({super.key, required this.product});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Detalles del Producto'),
+        title: Text(product.name),
       ),
-      body: _product != null
-          ? Padding(
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Product Image
+            Hero(
+              tag: 'product_${product.id}',
+              child: SizedBox(
+                width: double.infinity,
+                height: 300,
+                child: Image.network(
+                  product.imageUrl,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    child: Image.network(_product.imageUrl),
-                  ),
-                  const SizedBox(height: 16.0),
+                  // Product Name
                   Text(
-                    _product.name,
-                    style: Theme.of(context).textTheme.headline6,
+                    product.name,
+                    style: Theme.of(context).textTheme.headlineMedium,
                   ),
-                  const SizedBox(height: 8.0),
+                  const SizedBox(height: 8),
+                  // Price
                   Text(
-                    '\$${_product.price}',
-                    style: Theme.of(context).textTheme.subtitle1,
-                  ),
-                  const SizedBox(height: 16.0),
-                  Text(
-                    _product.description,
-                    style: Theme.of(context).textTheme.bodyText2,
-                  ),
-                  const SizedBox(height: 16.0),
-                  ElevatedButton(
-                    onPressed: () {
-                      BlocProvider.of<CartBloc>(context)
-                          .add(AddProductToCartEvent(_product));
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Producto agregado al carrito'),
-                          duration: Duration(seconds: 2),
+                    '${AppConstants.currencySymbol}${product.price.toStringAsFixed(2)}',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          color: Theme.of(context).primaryColor,
                         ),
-                      );
-                    },
-                    child: const Text('Agregar al Carrito'),
+                  ),
+                  const SizedBox(height: 16),
+                  // Description
+                  Text(
+                    product.description,
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                  const SizedBox(height: 24),
+                  // Add to Cart Button
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        context.read<CartBloc>().add(AddProductToCartEvent(product));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(AppConstants.addToCartSuccess),
+                            duration: const Duration(seconds: 2),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      child: const Text('Add to Cart'),
+                    ),
                   ),
                 ],
               ),
-            )
-          : const Center(
-              child: CircularProgressIndicator(),
             ),
+          ],
+        ),
+      ),
     );
   }
 }

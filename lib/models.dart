@@ -25,42 +25,77 @@ class Product {
 class Cart {
   final List<CartItem> items;
 
-  Cart({
-    required this.items,
-  });
+  Cart({List<CartItem>? items}) : items = items ?? [];
+
+  // Getter for products from cart items
+  List<Product> get products => items.map((item) => item.product).toList();
 
   double get totalPrice {
     return items.fold(0, (total, item) => total + item.subtotal);
   }
 
-  void addProduct(Product product) {
-    final existingItem =
-        items.firstWhere((item) => item.product.id == product.id);
+  int get itemCount => items.length;
 
-    if (existingItem != null) {
-      existingItem.quantity++;
-    } else {
-      items.add(CartItem(product: product, quantity: 1));
+  void addProduct(Product product) {
+    try {
+      final existingItem = items.firstWhere(
+        (item) => item.product.id == product.id,
+        orElse: () => CartItem(product: product, quantity: 0),
+      );
+
+      if (existingItem.quantity == 0) {
+        items.add(CartItem(product: product, quantity: 1));
+      } else {
+        existingItem.quantity++;
+      }
+    } catch (e) {
+      print('Error adding product to cart: $e');
     }
   }
 
   void removeProduct(Product product) {
-    final existingItemIndex =
-        items.indexWhere((item) => item.product.id == product.id);
+    try {
+      final existingItemIndex = items.indexWhere(
+        (item) => item.product.id == product.id,
+      );
 
-    if (existingItemIndex != -1) {
-      final existingItem = items[existingItemIndex];
-      if (existingItem.quantity > 1) {
-        existingItem.quantity--;
-      } else {
-        items.removeAt(existingItemIndex);
+      if (existingItemIndex != -1) {
+        final existingItem = items[existingItemIndex];
+        if (existingItem.quantity > 1) {
+          existingItem.quantity--;
+        } else {
+          items.removeAt(existingItemIndex);
+        }
       }
+    } catch (e) {
+      print('Error removing product from cart: $e');
+    }
+  }
+
+  void updateQuantity(Product product, int quantity) {
+    try {
+      final existingItemIndex = items.indexWhere(
+        (item) => item.product.id == product.id,
+      );
+
+      if (existingItemIndex != -1) {
+        if (quantity <= 0) {
+          items.removeAt(existingItemIndex);
+        } else {
+          items[existingItemIndex].quantity = quantity;
+        }
+      }
+    } catch (e) {
+      print('Error updating quantity: $e');
     }
   }
 
   void clear() {
     items.clear();
   }
+
+  // Factory constructor for empty cart
+  factory Cart.empty() => Cart(items: []);
 }
 
 class CartItem {
