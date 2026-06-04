@@ -1,16 +1,19 @@
-# slushbuster
+# SlushBuster
 
-A new Flutter project.
+Modern e-commerce Flutter application with rich animations and a smooth shopping experience.
 
-## Getting Started
+## Stack
 
-This project is a starting point for a Flutter application.
+- **Flutter** (`>=2.19.6`) — Cross-platform mobile app
+- **BLoC** — State management with flutter_bloc + equatable
+- **Lottie** — Rich animations
+- **Shimmer** — Loading placeholders
+- **Carousel Slider** — Product showcases
+- **SVG / Rating Bar** — Product display components
 
-A few resources to get you started if this is your first Flutter project:
+## Quick Start
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+```bash
+flutter pub get
+flutter run
+```
