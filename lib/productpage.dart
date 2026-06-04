@@ -63,9 +63,9 @@ class ProductPage extends StatelessWidget {
                       onPressed: () {
                         context.read<CartBloc>().add(AddProductToCartEvent(product));
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
+                          const SnackBar(
                             content: Text(AppConstants.addToCartSuccess),
-                            duration: const Duration(seconds: 2),
+                            duration: Duration(seconds: 2),
                           ),
                         );
                       },

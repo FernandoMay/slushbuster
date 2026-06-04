@@ -6,7 +6,7 @@ class AppTheme {
   static const _backgroundColor = Color(0xFFF5F5F5);
   static const _errorColor = Color(0xFFD32F2F);
 
-  static final _lightTextTheme = TextTheme(
+  static const _lightTextTheme = TextTheme(
     displayLarge: TextStyle(
       fontSize: 32,
       fontWeight: FontWeight.bold,
@@ -73,11 +73,11 @@ class AppTheme {
     colorScheme: const ColorScheme.light(
       primary: _primaryColor,
       secondary: _secondaryColor,
-      background: _backgroundColor,
+      surface: _backgroundColor,
       error: _errorColor,
       onPrimary: Colors.white,
       onSecondary: Colors.white,
-      onBackground: Colors.black87,
+      onSurface: Colors.black87,
       onError: Colors.white,
     ),
     appBarTheme: const AppBarTheme(
@@ -120,11 +120,11 @@ class AppTheme {
     colorScheme: const ColorScheme.dark(
       primary: _primaryColor,
       secondary: _secondaryColor,
-      background: Color(0xFF121212),
+      surface: Color(0xFF121212),
       error: _errorColor,
       onPrimary: Colors.white,
       onSecondary: Colors.white,
-      onBackground: Colors.white,
+      onSurface: Colors.white,
       onError: Colors.white,
     ),
     appBarTheme: const AppBarTheme(

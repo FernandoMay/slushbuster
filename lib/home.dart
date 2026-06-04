@@ -105,7 +105,7 @@ class _HomePageState extends State<HomePage> {
         slivers: [
           // Featured Products
           SliverToBoxAdapter(
-            child: Container(
+            child: SizedBox(
               height: 200.0,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
