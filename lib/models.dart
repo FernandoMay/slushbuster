@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 class Product {
   final String id;
   final String name;
@@ -49,7 +51,7 @@ class Cart {
         existingItem.quantity++;
       }
     } catch (e) {
-      print('Error adding product to cart: $e');
+      debugPrint('Error adding product to cart: $e');
     }
   }
 
@@ -68,7 +70,7 @@ class Cart {
         }
       }
     } catch (e) {
-      print('Error removing product from cart: $e');
+      debugPrint('Error removing product from cart: $e');
     }
   }
 
@@ -86,7 +88,7 @@ class Cart {
         }
       }
     } catch (e) {
-      print('Error updating quantity: $e');
+      debugPrint('Error updating quantity: $e');
     }
   }
 

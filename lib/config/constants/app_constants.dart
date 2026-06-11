@@ -1,5 +1,5 @@
 class AppConstants {
-  static const String appName = 'Slushbuster';
+  static const String appName = 'SlushBuster';
   static const String appVersion = '1.0.0';
   
   // Error Messages

@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context) => CartBloc()..add(LoadCartEvent())),
       ],
       child: MaterialApp(
-        title: 'Slushbuster',
+        title: 'SlushBuster',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.lightTheme,
         darkTheme: AppTheme.darkTheme,

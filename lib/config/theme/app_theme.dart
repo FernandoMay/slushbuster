@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  static const _primaryColor = Color(0xFF5C6BC0);
-  static const _secondaryColor = Color(0xFFFF4081);
-  static const _backgroundColor = Color(0xFFF5F5F5);
-  static const _errorColor = Color(0xFFD32F2F);
+  static const _seedColor = Color(0xFFFF4081);
 
   static const _lightTextTheme = TextTheme(
     displayLarge: TextStyle(
@@ -70,15 +67,9 @@ class AppTheme {
 
   static final lightTheme = ThemeData(
     useMaterial3: true,
-    colorScheme: const ColorScheme.light(
-      primary: _primaryColor,
-      secondary: _secondaryColor,
-      surface: _backgroundColor,
-      error: _errorColor,
-      onPrimary: Colors.white,
-      onSecondary: Colors.white,
-      onSurface: Colors.black87,
-      onError: Colors.white,
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: _seedColor,
+      brightness: Brightness.light,
     ),
     appBarTheme: const AppBarTheme(
       elevation: 0,
@@ -117,15 +108,9 @@ class AppTheme {
 
   static final darkTheme = ThemeData(
     useMaterial3: true,
-    colorScheme: const ColorScheme.dark(
-      primary: _primaryColor,
-      secondary: _secondaryColor,
-      surface: Color(0xFF121212),
-      error: _errorColor,
-      onPrimary: Colors.white,
-      onSecondary: Colors.white,
-      onSurface: Colors.white,
-      onError: Colors.white,
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: _seedColor,
+      brightness: Brightness.dark,
     ),
     appBarTheme: const AppBarTheme(
       elevation: 0,

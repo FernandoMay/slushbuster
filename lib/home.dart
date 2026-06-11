@@ -7,10 +7,10 @@ class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
-  _HomePageState createState() => _HomePageState();
+  HomePageState createState() => HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class HomePageState extends State<HomePage> {
   late List<Product> _products;
   late List<Product> _filteredProducts;
 
@@ -86,7 +86,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Slushbuster'),
+        title: const Text('SlushBuster'),
         actions: [
           IconButton(
             icon: const Icon(Icons.shopping_cart),
